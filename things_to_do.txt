@@ -1,7 +1,0 @@
-Program stops responding if the other buttons are pressed before stopping the recording
-
-create a new file for the remaning text after each session
-
-text overflows the label box for few sentences
-
-zipping the files and uploading to drive
