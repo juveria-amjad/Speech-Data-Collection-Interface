@@ -39,6 +39,9 @@ def threading_rec(x):
         # messagebox.showinfo(message="Recording finished")
     elif x == 3:
         # Play Recording
+        #stop recording to play
+        recording = False
+
         if file_exists:
             readFrom = "NLP/TempOutputSpeech/" + currentID + ".wav"
             data, fs = sf.read(readFrom, dtype='float32')
@@ -57,6 +60,10 @@ def threading_rec(x):
             nametext = "NLP/OutputText/" + currentID + ".txt"
             textfile = codecs.open(nametext, 'w', 'utf-8')
             textfile.write(mytext)
+            #Auto Next text display on Upload
+            mytext = arrayi[i]
+            title_lbl.configure(text=mytext)
+            i += 1
     elif x == 4:
         # Next
         file_exists = False
