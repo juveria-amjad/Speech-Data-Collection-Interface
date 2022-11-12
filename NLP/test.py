@@ -28,15 +28,17 @@ i = 0
 
 
 def threading_rec(x):
-    global recording, i, mytext, file_exists
+    global recording, i, mytext, file_exists, record_btn
     if x == 1:
         # Start Recording
         t1 = threading.Thread(target=record_audio)
         t1.start()
+        record_btn.set_text("Recording")
     elif x == 2:
         # Stop Recording
         recording = False
         # messagebox.showinfo(message="Recording finished")
+        record_btn.set_text("Record")
     elif x == 3:
         # Play Recording
         #stop recording to play
@@ -47,6 +49,7 @@ def threading_rec(x):
             data, fs = sf.read(readFrom, dtype='float32')
             sd.play(data, fs)
             sd.wait()
+            record_btn.set_text("Record")
         else:
             messagebox.showerror(message="Record something to play")
     elif x == 5:
@@ -64,12 +67,19 @@ def threading_rec(x):
             mytext = arrayi[i]
             title_lbl.configure(text=mytext)
             i += 1
+            record_btn.set_text("Record")
     elif x == 4:
         # Next
-        file_exists = False
+        #Add to skipped files
+        nametext = "NLP/SkippedFiles.txt"
+        textfile = codecs.open(nametext, 'a', 'utf-8')
+        textfile.write(mytext)
+        
         mytext = arrayi[i]
         title_lbl.configure(text=mytext)
         i += 1
+        record_btn.set_text("Record")
+        file_exists = False
 
 # Recording function
 
@@ -128,6 +138,7 @@ def getInput():
 getInput()
 
 voice_rec = customtkinter.CTk()
+
 voice_rec.geometry("780x520")
 voice_rec.title("Medical Data Collection")
 voice_rec.grid_columnconfigure(0, weight=1)
@@ -151,13 +162,13 @@ frame_down.columnconfigure((0, 1, 2, 3, 4), weight=1)
 frame_down.rowconfigure(0, weight=1)
 
 record_btn = customtkinter.CTkButton(master=frame_down,
-                                     text="Record",
+                                     text="Record",  
                                      command=lambda m=1: threading_rec(m))
 record_btn.grid(row=0, column=0, pady=10, padx=20)
 
 stop_btn = customtkinter.CTkButton(master=frame_down,
                                    text="Stop",
-                                   command=lambda m=2: threading_rec(m))
+                                   command=lambda m=2: threading_rec(m) )
 stop_btn.grid(row=0, column=1, pady=10, padx=20)
 
 play_btn = customtkinter.CTkButton(master=frame_down,
