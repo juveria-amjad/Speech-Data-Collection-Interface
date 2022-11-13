@@ -1,0 +1,27 @@
+Program stops responding if the other buttons are pressed before stopping the recording
+
+[DONE]  create a new file for the remaning text after each session (trigger on skip)
+
+[DONE]  Auto next when upload is pressed
+
+[DONE]  Auto stop when play is pressed
+
+[DONE]  Indicate recording or pause or stop thorugh text or change in color
+
+text overflows the label box for few sentences (should be managed in the corpus)
+
+zipping the files and uploading to drive (after the program is closed)
+
+Updates:
+
+[DONE]  Auto stop when upload is pressed
+
+[DONE]  Disable the play button when recording
+
+[DONE]  Disable skip button once EOF reached
+
+[DONE]  Created global variables for paths
+
+[DONE]  Update the og file with the remaning text + the skippped text after the recording session
+
+Last line of the file always there
