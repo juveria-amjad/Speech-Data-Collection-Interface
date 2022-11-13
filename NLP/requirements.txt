@@ -1,3 +1,0 @@
-sounddevice
-soundfile
-customtkinter
