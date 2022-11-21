@@ -11,3 +11,17 @@ Program stops responding if the other buttons are pressed before stopping the re
 text overflows the label box for few sentences (should be managed in the corpus)
 
 zipping the files and uploading to drive (after the program is closed)
+
+Updates:
+
+[DONE]  Auto stop when upload is pressed
+
+[DONE]  Disable the play button when recording
+
+[DONE]  Disable skip button once EOF reached
+
+[DONE]  Created global variables for paths
+
+[DONE]  Update the og file with the remaning text + the skippped text after the recording session
+
+Last line of the file always there

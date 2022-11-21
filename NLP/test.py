@@ -17,6 +17,11 @@ recording = False
 file_exists = False
 mytext = "Hello"
 currentID = 0
+INPUTTEXT = 'NLP/input2.txt'
+SKIPTEXT = 'NLP/SkippedFiles.txt'
+TEMPOUTPUTSPEECH = "NLP/TempOutputSpeech/"
+OUTPUTSPEECH = "NLP/OutputSpeech/"
+OUTPUTTEXT = "NLP/OutputText/"
 
 
 def callback(indata, frames, time, status):
@@ -33,53 +38,62 @@ def threading_rec(x):
         # Start Recording
         t1 = threading.Thread(target=record_audio)
         t1.start()
-        record_btn.set_text("Recording")
+        record_btn.configure(state='disabled', text="Recording")
     elif x == 2:
         # Stop Recording
         recording = False
         # messagebox.showinfo(message="Recording finished")
-        record_btn.set_text("Record")
+        record_btn.configure(state='normal', text="Record")
     elif x == 3:
         # Play Recording
-        #stop recording to play
+        # stop recording to play
         recording = False
 
         if file_exists:
-            readFrom = "NLP/TempOutputSpeech/" + currentID + ".wav"
+            record_btn.configure(state='normal', text="Record")
+            readFrom = TEMPOUTPUTSPEECH + currentID + ".wav"
             data, fs = sf.read(readFrom, dtype='float32')
             sd.play(data, fs)
             sd.wait()
-            record_btn.set_text("Record")
+
         else:
             messagebox.showerror(message="Record something to play")
     elif x == 5:
         # Upload Recording
         if not file_exists:
             messagebox.showerror(message="Record something to upload")
+        elif recording:
+            messagebox.showerror(message="Please stop the recording")
         else:
-            source = "NLP/TempOutputSpeech/"+currentID+".wav"
-            destination = 'NLP/OutputSpeech'
+            source = TEMPOUTPUTSPEECH + currentID + ".wav"
+            destination = OUTPUTSPEECH
             shutil.copy2(source, destination)
-            nametext = "NLP/OutputText/" + currentID + ".txt"
+            nametext = OUTPUTTEXT + currentID + ".txt"
             textfile = codecs.open(nametext, 'w', 'utf-8')
             textfile.write(mytext)
-            #Auto Next text display on Upload
+            # Auto Next text display on Upload
             mytext = arrayi[i]
             title_lbl.configure(text=mytext)
             i += 1
             record_btn.set_text("Record")
+
+            file_exists = False
+
     elif x == 4:
-        # Next
-        #Add to skipped files
-        nametext = "NLP/SkippedFiles.txt"
-        textfile = codecs.open(nametext, 'a', 'utf-8')
-        textfile.write(mytext)
-        
-        mytext = arrayi[i]
-        title_lbl.configure(text=mytext)
-        i += 1
-        record_btn.set_text("Record")
-        file_exists = False
+        # Skip
+        # Add to skipped files
+        if i == len(arrayi):
+            next_btn.configure(state="disabled")
+        else:
+            recording = False
+            textfile = codecs.open(SKIPTEXT, 'a', 'utf-8')
+            textfile.write(mytext)
+
+            mytext = arrayi[i]
+            title_lbl.configure(text=mytext)
+            i += 1
+            record_btn.configure(state='normal', text="Record")
+            file_exists = False
 
 # Recording function
 
@@ -95,7 +109,7 @@ def record_audio():
 
     # messagebox.showinfo(message="Recording Audio. Speak into the mic")
     currentID = str(uuid.uuid4())
-    name = "NLP/TempOutputSpeech/" + currentID + ".wav"
+    name = TEMPOUTPUTSPEECH + currentID + ".wav"
 
     with sf.SoundFile(name, mode='w', samplerate=44100,
                       channels=2) as file:
@@ -111,7 +125,7 @@ def record_audio():
 
 
 def on_closing():
-    folder = 'NLP/TempOutputSpeech'
+    folder = TEMPOUTPUTSPEECH
     for filename in os.listdir(folder):
         file_path = os.path.join(folder, filename)
         try:
@@ -121,6 +135,13 @@ def on_closing():
                 shutil.rmtree(file_path)
         except Exception as e:
             print('Failed to delete %s. Reason: %s' % (file_path, e))
+
+    textfile = codecs.open(SKIPTEXT, 'a', 'utf-8')
+    for line in arrayi[i-1:]:
+        textfile.write(line)
+    textfile.close()
+    shutil.copy2(SKIPTEXT, INPUTTEXT)
+    os.remove(SKIPTEXT)
     voice_rec.destroy()
 
 
@@ -129,10 +150,12 @@ def change_appearance_mode(new_appearance_mode):
 
 
 def getInput():
-    global arrayi
-    file1 = codecs.open('NLP/input1.txt', 'r', 'utf-8')
+    global arrayi, mytext, i
+    file1 = codecs.open(INPUTTEXT, 'r', 'utf-8')
     Lines = file1.readlines()
     arrayi = Lines
+    mytext = arrayi[i]
+    i += 1
 
 
 getInput()
@@ -162,13 +185,13 @@ frame_down.columnconfigure((0, 1, 2, 3, 4), weight=1)
 frame_down.rowconfigure(0, weight=1)
 
 record_btn = customtkinter.CTkButton(master=frame_down,
-                                     text="Record",  
+                                     text="Record",
                                      command=lambda m=1: threading_rec(m))
 record_btn.grid(row=0, column=0, pady=10, padx=20)
 
 stop_btn = customtkinter.CTkButton(master=frame_down,
                                    text="Stop",
-                                   command=lambda m=2: threading_rec(m) )
+                                   command=lambda m=2: threading_rec(m))
 stop_btn.grid(row=0, column=1, pady=10, padx=20)
 
 play_btn = customtkinter.CTkButton(master=frame_down,
@@ -177,7 +200,7 @@ play_btn = customtkinter.CTkButton(master=frame_down,
 play_btn.grid(row=0, column=2, pady=10, padx=20)
 
 next_btn = customtkinter.CTkButton(master=frame_down,
-                                   text="Next/Skip",
+                                   text="Skip",
                                    command=lambda m=4: threading_rec(m))
 next_btn.grid(row=0, column=4, pady=10, padx=20)
 
